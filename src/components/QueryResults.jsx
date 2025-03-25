@@ -1,6 +1,8 @@
 import React, { useState } from "react";
+import * as XLSX from "xlsx";
 
 const mockResults = {
+
     "SELECT * FROM Customers;": [
         {
             "customerID": "ANATR",
@@ -1385,8 +1387,7 @@ const mockResults = {
     ]
     ,
 };
-
-const QueryResults = ({ query }) => {  
+const QueryResults = ({ query }) => {
     const result = mockResults[query] || [{ message: "No data found" }];
     const [currentPage, setCurrentPage] = useState(1);
     const rowsPerPage = 10;
@@ -1403,8 +1404,96 @@ const QueryResults = ({ query }) => {
         if (currentPage < totalPages) setCurrentPage(currentPage + 1);
     };
 
+    const downloadCSV = () => {
+        const csvHeaders = Object.keys(result[0] || {}).join(",");
+        const csvRows = result.map(row =>
+            Object.values(row).map(val => `"${val}"`).join(",")
+        );
+        const csvContent = [csvHeaders, ...csvRows].join("\n");
+
+        const blob = new Blob([csvContent], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "query_results.csv";
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
+    const downloadJSON = () => {
+        const jsonContent = JSON.stringify(result, null, 2);
+        const blob = new Blob([jsonContent], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "query_results.json";
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
+    const downloadExcel = () => {
+        const headers = Object.keys(result[0] || {});
+        const rows = result.map(row => Object.values(row));
+
+        const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Query Results");
+
+        const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+        const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "query_results.xlsx";
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
+    const downloadPDF = () => {
+        import("jspdf").then(jsPDF => {
+            import("jspdf-autotable").then(autoTable => {
+                const doc = new jsPDF.default({ orientation: "landscape" });
+                const headers = [Object.keys(result[0] || {})];
+                const rows = result.map(row => Object.values(row));
+        
+                autoTable.default(doc, {
+                    head: headers,
+                    body: rows,
+                });
+        
+                doc.save("query_results.pdf");
+            });
+        });
+    };
+
     return (
         <div>
+            <div className="mt-4">
+                <button
+                    onClick={downloadCSV}
+                    className="px-4 py-2 border rounded bg-blue-500 text-black"
+                >
+                    Download CSV
+                </button>
+                <button
+                    onClick={downloadJSON}
+                    className="px-4 py-2 border rounded bg-green-500 text-black ml-2"
+                >
+                    Download JSON
+                </button>
+                <button
+                    onClick={downloadExcel}
+                    className="px-4 py-2 border rounded bg-yellow-500 text-black ml-2"
+                >
+                    Download Excel
+                </button>
+                <button
+                    onClick={downloadPDF}
+                    className="px-4 py-2 border rounded bg-red-500 text-black ml-2"
+                >
+                    Download PDF
+                </button>
+            </div>
             <table className="w-full border-collapse border">
                 <thead>
                     <tr>
