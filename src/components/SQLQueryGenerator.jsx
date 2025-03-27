@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { HfInference } from "@huggingface/inference";
+
 
 const SqlQueryGenerator = () => {
     const [prompt, setPrompt] = useState('');
@@ -7,26 +9,16 @@ const SqlQueryGenerator = () => {
 
     const handleGenerateQuery = async () => {
         try {
+            const HF_API_KEY = "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"; // Load API Key from environment variables
+            const inference = new HfInference(HF_API_KEY);
+            const model = "cssupport/t5-small-awesome-text-to-sql";
 
-            console.log(import.meta.env.VITE_OPENAI_API_KEY);
+            const response = await inference.textGeneration({
+                model: model,
+                inputs: prompt,
+            });
+            setSqlQuery(response.generated_text);
             
-            const response = await axios.post(
-                'https://api.openai.com/v1/chat/completions',
-                {
-                    model: 'gpt-4o-mini',
-                    messages: [
-                        { role: 'user', content: `Give only SQL query for: ${prompt}` }
-                    ],
-                    temperature: 0.5,
-                },
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
-                    },
-                }
-            );
-            setSqlQuery(response.data.choices[0].message.content.trim());
         } catch (error) {
             console.error('Error generating SQL query:', error);
         }

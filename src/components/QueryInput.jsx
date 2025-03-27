@@ -1,76 +1,113 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+const groupQueriesByDate = (history) => {
+  const today = new Date();
+  const yesterday = new Date(today);
+  const sevenDaysAgo = new Date(today);
+  const thirtyDaysAgo = new Date(today);
 
-const QueryInput = ({ onExecute }) => {
-    // Load history from localStorage on mount
-    const [queryHistory, setQueryHistory] = useState(() => {
-        const savedHistory = localStorage.getItem("queryHistory");
-        return savedHistory ? JSON.parse(savedHistory) : [];
-    });
+  yesterday.setDate(today.getDate() - 1);
+  sevenDaysAgo.setDate(today.getDate() - 7);
+  thirtyDaysAgo.setDate(today.getDate() - 30);
 
-    const [query, setQuery] = useState("");
+  const grouped = {
+    Today: [],
+    Yesterday: [],
+    "Last 7 Days": [],
+    "30 Days or More": [],
+  };
 
-    // Save history to localStorage whenever it updates
-    useEffect(() => {
-        localStorage.setItem("queryHistory", JSON.stringify(queryHistory));
-    }, [queryHistory]);
+  history.forEach(({ query, timestamp }) => {
+    const queryDate = new Date(timestamp);
 
-    const handleRunQuery = () => {
-        if (query.trim() === "") return; // Prevent empty queries
+    if (queryDate.toDateString() === today.toDateString()) {
+      grouped.Today.push(query);
+    } else if (queryDate.toDateString() === yesterday.toDateString()) {
+      grouped.Yesterday.push(query);
+    } else if (queryDate > sevenDaysAgo) {
+      grouped["Last 7 Days"].push(query);
+    } else {
+      grouped["30 Days or More"].push(query);
+    }
+  });
 
-        // Remove duplicate query before adding the new one
-        const updatedHistory = [query, ...queryHistory.filter((q) => q !== query)];
-        setQueryHistory(updatedHistory);
-        onExecute(query); // Execute query
-    };
-
-    const handleClearHistory = () => {
-        setQueryHistory([]); // Clear history
-        localStorage.removeItem("queryHistory"); // Remove from localStorage
-    };
-
-    const handleUseQuery = (selectedQuery) => {
-        setQuery(selectedQuery); // Copy selected query to textarea
-    };
-
-    return (
-        <div>
-            <textarea
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Type SQL query here..."
-                className="w-full h-24 p-2 border rounded"
-            />
-            <button onClick={handleRunQuery} className="mt-2 px-4 py-2 bg-blue-500 text-black rounded">
-                Run Query
-            </button>
-            <button onClick={handleClearHistory} className="mt-2 ml-2 px-4 py-2 bg-red-500 text-black rounded">
-                Clear History
-            </button>
-
-            {queryHistory.length > 0 && (
-                <QueryHistory history={queryHistory} onUseQuery={handleUseQuery} />
-            )}
-        </div>
-    );
+  return grouped;
 };
 
-// QueryHistory Component with "Use" Buttons
-const QueryHistory = ({ history, onUseQuery }) => {
-    return (
-        <div className="mt-4 p-2 border rounded">
-            <h3 className="font-bold">Query History</h3>
-            <ul className="list-disc pl-4">
-                {history.map((query, index) => (
-                    <li key={index} className="flex justify-between items-center">
-                        <span>{query}</span>
-                        <button onClick={() => onUseQuery(query)} className="ml-2 px-2 py-1 bg-yellow-500 text-black rounded">
-                            Use
-                        </button>
-                    </li>
-                ))}
-            </ul>
-        </div>
-    );
+const QueryInput = ({ onExecute, queryHistory, setQueryHistory, selectedQuery, onSaveQuery }) => {
+  const [query, setQuery] = useState(""); // Keeps the current input query
+  const [newtemp, setNewTemp] = useState(""); // Keeps the selected text from textarea
+
+  useEffect(() => {
+    setQuery(selectedQuery); // Synchronize selected query with parent state
+  }, [selectedQuery]);
+
+  const handleRunQuery = () => {
+    const data = newtemp || query; // Prioritize selected text, fallback to query
+
+    if (data.trim() === "") return; // Prevent empty queries
+    const timestamp = new Date().toISOString(); // Add current timestamp
+    const updatedHistory = [
+      { query, timestamp }, // Save query with timestamp for history only
+      ...queryHistory.filter((item) => item.query !== query),
+    ];
+    setQueryHistory(updatedHistory);
+
+    // Add query to history and avoid duplicates
+    // const updatedHistory = [data, ...queryHistory.filter((q) => q !== data)];
+
+
+    setQueryHistory(updatedHistory);
+    onExecute(data); // Execute the query
+
+    // Clear selected text after execution
+    setNewTemp("");
+  };
+
+  const handleMouseUp = (e) => {
+    const textarea = e.target;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+
+    if (start === end) return; // No text selected
+
+    const selectedText = textarea.value.substring(start, end).trim();
+    if (selectedText === "") return; // Prevent empty selections
+
+    setNewTemp(selectedText); // Update selected text state
+  };
+
+  return (
+    <div>
+      {/* SQL Input Textarea */}
+      <textarea
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        onMouseUp={handleMouseUp}
+        placeholder="Type SQL query here..."
+        className="w-full h-24 p-2 border rounded"
+      />
+
+      {/* Run Query Button */}
+      <button
+        onClick={handleRunQuery}
+        disabled={query.trim() === ""} // Disable button if textarea is empty
+        className={`mt-2 px-4 py-2 rounded ${query.trim() === "" ? "bg-gray-200 text-gray-500 cursor-not-allowed" : "bg-blue-500 text-black"
+          }`}
+      >
+        Run Query
+      </button>
+
+      {/* Save Query Button */}
+      <button
+        onClick={() => onSaveQuery(query)} // Trigger save query logic
+        disabled={query.trim() === ""} // Disable button if textarea is empty
+        className={`mt-2 ml-2 px-4 py-2 rounded ${query.trim() === "" ? "bg-gray-200 text-gray-500 cursor-not-allowed" : "bg-purple-500 text-black"
+          }`}
+      >
+        Save Query
+      </button>
+    </div>
+  );
 };
 
 export default QueryInput;

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import * as XLSX from "xlsx";
 
 const mockResults = {
-
     "SELECT * FROM Customers;": [
         {
             "customerID": "ANATR",
@@ -1387,7 +1386,7 @@ const mockResults = {
     ]
     ,
 };
-const QueryResults = ({ query }) => {
+const QueryResults = ({ query}) => {
     const result = mockResults[query] || [{ message: "No data found" }];
     const [currentPage, setCurrentPage] = useState(1);
     const rowsPerPage = 10;
@@ -1494,24 +1493,26 @@ const QueryResults = ({ query }) => {
                     Download PDF
                 </button>
             </div>
-            <table className="w-full border-collapse border">
-                <thead>
-                    <tr>
-                        {Object.keys(currentRows[0] || {}).map((key) => (
-                            <th key={key} className="border p-2">{key}</th>
-                        ))}
-                    </tr>
-                </thead>
-                <tbody>
-                    {currentRows.map((row, index) => (
-                        <tr key={index}>
-                            {Object.values(row).map((val, i) => (
-                                <td key={i} className="border p-2">{val}</td>
+            <div className="overflow-x-auto">
+                <table className="w-full max-w-full border-collapse border">
+                    <thead>
+                        <tr>
+                            {Object.keys(currentRows[0] || {}).map((key) => (
+                                <th key={key} className="border p-2">{key}</th>
                             ))}
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {currentRows.map((row, index) => (
+                            <tr key={index}>
+                                {Object.values(row).map((val, i) => (
+                                    <td key={i} className="border p-2">{val}</td>
+                                ))}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
             <div className="flex justify-between mt-4">
                 <button
                     onClick={handlePrevPage}
