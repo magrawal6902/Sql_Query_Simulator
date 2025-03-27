@@ -9,8 +9,8 @@ const SqlQueryGenerator = () => {
 
     const handleGenerateQuery = async () => {
         try {
-            const HF_API_KEY = "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"; // Load API Key from environment variables
-            const inference = new HfInference(HF_API_KEY);
+            const key = import.meta.env.VITE_HF_API_KEY
+            const inference = new HfInference(key);
             const model = "cssupport/t5-small-awesome-text-to-sql";
 
             const response = await inference.textGeneration({
