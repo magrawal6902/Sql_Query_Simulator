@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+
 const groupQueriesByDate = (history) => {
   const today = new Date();
   const yesterday = new Date(today);
@@ -55,7 +56,6 @@ const QueryInput = ({ onExecute, queryHistory, setQueryHistory, selectedQuery, o
     // Add query to history and avoid duplicates
     // const updatedHistory = [data, ...queryHistory.filter((q) => q !== data)];
 
-
     setQueryHistory(updatedHistory);
     onExecute(data); // Execute the query
 
@@ -77,22 +77,21 @@ const QueryInput = ({ onExecute, queryHistory, setQueryHistory, selectedQuery, o
   };
 
   return (
-    <div>
+    <div className="query-input-container">
       {/* SQL Input Textarea */}
       <textarea
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onMouseUp={handleMouseUp}
         placeholder="Type SQL query here..."
-        className="w-full h-24 p-2 border rounded"
+        className="query-input-textarea"
       />
 
       {/* Run Query Button */}
       <button
         onClick={handleRunQuery}
         disabled={query.trim() === ""} // Disable button if textarea is empty
-        className={`mt-2 px-4 py-2 rounded ${query.trim() === "" ? "bg-gray-200 text-gray-500 cursor-not-allowed" : "bg-blue-500 text-black"
-          }`}
+        className={`run-query-button ${query.trim() === "" ? "button-disabled" : "button-enabled"}`}
       >
         Run Query
       </button>
@@ -101,8 +100,7 @@ const QueryInput = ({ onExecute, queryHistory, setQueryHistory, selectedQuery, o
       <button
         onClick={() => onSaveQuery(query)} // Trigger save query logic
         disabled={query.trim() === ""} // Disable button if textarea is empty
-        className={`mt-2 ml-2 px-4 py-2 rounded ${query.trim() === "" ? "bg-gray-200 text-gray-500 cursor-not-allowed" : "bg-purple-500 text-black"
-          }`}
+        className={`save-query-button ${query.trim() === "" ? "button-disabled" : "button-enabled"}`}
       >
         Save Query
       </button>

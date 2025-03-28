@@ -21,59 +21,59 @@ const SaveQueryPopup = ({ query, categories, onCreateCategory, onSaveToCategory,
   };
 
   return (
-    <div className="fixed top-0 left-0 w-full h-full bg-white bg-opacity-60 flex items-center justify-center">
-      <div className="bg-white p-6 rounded shadow-lg w-1/3">
-        <h2 className="text-xl font-bold mb-4">Save Query</h2>
-        <p className="mb-4">
-          Query: <strong>{query}</strong>
-        </p>
+    <div className="save-query-overlay">
+        <div className="save-query-content">
+            <h2 className="save-query-title">Save Query</h2>
+            <p className="save-query-description">
+                Query: <strong>{query}</strong>
+            </p>
 
-        {/* List existing categories */}
-        <h3 className="font-bold mb-2">Categories:</h3>
-        <ul className="mb-4">
-          {filteredCategories.length > 0 ? (
-            filteredCategories.map((category) => (
-              <li key={category} className="mt-1">
-                <a
-                  href="#"
-                  onClick={() => onSaveToCategory(category, query)} // Save query when category is clicked
-                  className="text-blue-500 underline cursor-pointer"
+            {/* List existing categories */}
+            <h3 className="categories-title">Categories:</h3>
+            <ul className="categories-list">
+                {filteredCategories.length > 0 ? (
+                    filteredCategories.map((category) => (
+                        <li key={category} className="category-item">
+                            <a
+                                href="#"
+                                onClick={() => onSaveToCategory(category, query)} // Save query when category is clicked
+                                className="category-link"
+                            >
+                                {category}
+                            </a>
+                        </li>
+                    ))
+                ) : (
+                    <p className="no-categories">No available categories.</p>
+                )}
+            </ul>
+
+            {/* Create new category */}
+            <div className="new-category">
+                <input
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                    placeholder="New Category Name"
+                    className="new-category-input"
+                />
+                <button
+                    onClick={handleCreateCategory} // Create category and save query
+                    className="create-category-button"
                 >
-                  {category}
-                </a>
-              </li>
-            ))
-          ) : (
-            <p className="text-gray-500">No available categories.</p>
-          )}
-        </ul>
+                    Create
+                </button>
+            </div>
 
-        {/* Create new category */}
-        <div className="flex mt-4">
-          <input
-            value={newCategory}
-            onChange={(e) => setNewCategory(e.target.value)}
-            placeholder="New Category Name"
-            className="flex-1 border rounded px-2 py-1 mr-2"
-          />
-          <button
-            onClick={handleCreateCategory} // Create category and save query
-            className="px-4 py-1 bg-green-500 text-black rounded"
-          >
-            Create
-          </button>
+            {/* Close Popup */}
+            <button
+                onClick={onClose}
+                className="close-button"
+            >
+                Close
+            </button>
         </div>
-
-        {/* Close Popup */}
-        <button
-          onClick={onClose}
-          className="mt-4 px-4 py-2 bg-red-500 text-black rounded"
-        >
-          Close
-        </button>
-      </div>
     </div>
-  );
+);
 };
 
 export default SaveQueryPopup;

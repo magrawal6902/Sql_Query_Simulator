@@ -9,6 +9,8 @@ const SqlQueryGenerator = () => {
 
     const handleGenerateQuery = async () => {
         try {
+            console.log(prompt);
+            
             const key = import.meta.env.VITE_HF_API_KEY
             const inference = new HfInference(key);
             const model = "cssupport/t5-small-awesome-text-to-sql";
@@ -17,6 +19,8 @@ const SqlQueryGenerator = () => {
                 model: model,
                 inputs: prompt,
             });
+            console.log(response.generated_text);
+            
             setSqlQuery(response.generated_text);
             
         } catch (error) {
@@ -25,17 +29,20 @@ const SqlQueryGenerator = () => {
     };
 
     return (
-        <div>
+        <div className="prompt-container">
             <textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 placeholder="Enter your prompt here..."
+                className="prompt-textarea"
             />
-            <button onClick={handleGenerateQuery}>Generate SQL Query</button>
+            <button onClick={handleGenerateQuery} className="generate-button">
+                Generate SQL Query
+            </button>
             {sqlQuery && (
-                <div>
-                    <h2>Generated SQL Query:</h2>
-                    <pre>{sqlQuery}</pre>
+                <div className="sql-query-container">
+                    <h2 className="sql-query-title">Generated SQL Query:</h2>
+                    <pre className="sql-query">{sqlQuery}</pre>
                 </div>
             )}
         </div>

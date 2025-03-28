@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { FaArrowLeft, FaTimes } from "react-icons/fa";
 
 const LearnOverlay = ({ isOpen, onClose }) => {
   const [selectedTag, setSelectedTag] = useState(null); // Track the selected tag
@@ -66,41 +67,37 @@ const LearnOverlay = ({ isOpen, onClose }) => {
   };
 
   return (
-    <div
-      className={`fixed top-0 right-0 h-full bg-white w-[40%] shadow-lg transition-transform duration-300 ${
-        isOpen ? "translate-x-0" : "translate-x-full"
-      }`}
-    >
-      <div className="p-4 h-full flex flex-col">
+    <div className={`learn-overlay ${isOpen ? "learn-overlay-open" : ""}`}>
+      <div className="learn-overlay-content">
         {/* Header Section */}
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-bold text-lg">{selectedTag ? selectedTag : "Learn SQL"}</h2>
+        <div className="learn-overlay-header">
+          <h2 className="learn-overlay-title">{selectedTag ? selectedTag : "Learn SQL"}</h2>
           <button
             onClick={selectedTag ? handleBackClick : onClose}
-            className="px-3 py-1 bg-blue-500 text-black rounded"
+            className="learn-overlay-button"
           >
-            {selectedTag ? "Back" : "Close"}
+            {selectedTag ? <FaArrowLeft/> : <FaTimes/>}
           </button>
         </div>
 
         {/* Content Section */}
-        <div className="flex-1 overflow-y-auto pr-2">
+        <div className="learn-overlay-body">
           {selectedTag ? (
             // Display definition and example query for the selected tag
-            <div>
-              <p className="mb-4"><strong>Definition:</strong> {sqlTags[selectedTag].definition}</p>
-              <p className="mb-4"><strong>Example Query:</strong></p>
-              <code className="block bg-gray-100 p-2 rounded">{sqlTags[selectedTag].example}</code>
+            <div className="learn-overlay-tag-content">
+              <p className="learn-overlay-definition"><strong>Definition:</strong> {sqlTags[selectedTag].definition}</p>
+              <p className="learn-overlay-example-title"><strong>Example Query:</strong></p>
+              <code className="learn-overlay-example">{sqlTags[selectedTag].example}</code>
             </div>
           ) : (
             // Display the list of SQL topics
-            <ul className="list-disc pl-5 mt-4">
+            <ul className="learn-overlay-tag-list">
               {Object.keys(sqlTags).map((tag) => (
-                <li key={tag} className="mt-2">
+                <li key={tag} className="learn-overlay-tag-item">
                   <a
                     href="#"
                     onClick={() => handleTagClick(tag)}
-                    className="text-blue-500 underline"
+                    className="learn-overlay-tag-link"
                   >
                     {tag}
                   </a>

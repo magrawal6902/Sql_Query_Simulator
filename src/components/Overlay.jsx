@@ -1,4 +1,5 @@
 import React from "react";
+import { FaPlay, FaTimes, FaTrash } from "react-icons/fa";
 
 const Overlay = ({ isOpen, onClose, queryHistory, onUseQuery, onClearHistory }) => {
   // Group queries by time categories
@@ -40,53 +41,49 @@ const Overlay = ({ isOpen, onClose, queryHistory, onUseQuery, onClearHistory }) 
   const groupedQueries = groupQueriesByDate(queryHistory);
 
   return (
-    <div
-      className={`fixed top-0 right-0 h-full bg-white w-[40%] shadow-lg transition-transform duration-300 ${
-        isOpen ? "translate-x-0" : "translate-x-full"
-      }`}
-    >
-      <div className="p-4 h-full flex flex-col">
+    <div className={`overlay ${isOpen ? "overlay-open" : ""}`}>
+      <div className="overlay-content">
         {/* Header Section */}
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-bold text-lg">Query History</h2>
-          <div className="flex space-x-2">
+        <div className="overlay-header">
+          <h2 className="overlay-title">Query History</h2>
+          <div className="overlay-buttons">
             {/* Clear History Button */}
             <button
               onClick={onClearHistory}
-              className="px-3 py-1 bg-red-500 text-white rounded"
+              className="clear-history-button"
             >
-              Clear History
+              <FaTrash/>
             </button>
             {/* Close Overlay Button */}
             <button
               onClick={onClose}
-              className="px-3 py-1 bg-blue-500 text-white rounded"
+              className="close-overlay-button"
             >
-              Close
+              <FaTimes/>
             </button>
           </div>
         </div>
 
         {/* Scrollable Query History List */}
-        <div className="flex-1 overflow-y-auto pr-2">
+        <div className="overlay-body">
           {Object.keys(groupedQueries)
             .filter((category) => groupedQueries[category].length > 0) // Filter out empty groups
             .map((category) => (
-              <div key={category} className="mb-4">
+              <div key={category} className="overlay-category">
                 {/* Category Header */}
-                <h3 className="font-bold text-blue-600">{category}</h3>
-                <ul className="list-disc pl-4">
+                <h3 className="overlay-category-title">{category}</h3>
+                <ul className="overlay-query-list">
                   {groupedQueries[category].map((query, index) => (
                     <li
                       key={index}
-                      className="flex justify-between mt-2 items-center p-2 border rounded-md"
+                      className="overlay-query-item"
                     >
                       <span>{query}</span>
                       <button
                         onClick={() => onUseQuery(query)}
-                        className="ml-2 px-3 py-1 bg-yellow-500 text-black rounded hover:bg-yellow-400"
+                        className="use-query-button"
                       >
-                        Use
+                        <FaPlay/>
                       </button>
                     </li>
                   ))}

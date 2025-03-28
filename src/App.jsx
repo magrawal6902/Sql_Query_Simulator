@@ -4,17 +4,18 @@ import QueryResults from "./components/QueryResults";
 import "./App.css";
 import SqlQueryGenerator from "./components/SQLQueryGenerator";
 import Overlay from "./components/Overlay";
-import LearnOverlay from "./components/LearnOverlay"; 
-import SavedQueryOverlay from "./components/SavedQueryOverlay"; 
+import LearnOverlay from "./components/LearnOverlay";
+import SavedQueryOverlay from "./components/SavedQueryOverlay";
 import SaveQueryPopup from "./components/SaveQueryPopup";
+import { FaTimes, FaTrash, FaHistory, FaAdjust, FaSun } from 'react-icons/fa';
 
 function App() {
   const [selectedQuery, setSelectedQuery] = useState("");
   const [temp, setTemp] = useState("");
   const [isHistoryOverlayOpen, setIsHistoryOverlayOpen] = useState(false);
   const [isLearnOverlayOpen, setIsLearnOverlayOpen] = useState(false);
-  const [isSavedQueryOverlayOpen, setIsSavedQueryOverlayOpen] = useState(false); 
-  const [isSaveQueryPopupOpen, setIsSaveQueryPopupOpen] = useState(false); 
+  const [isSavedQueryOverlayOpen, setIsSavedQueryOverlayOpen] = useState(false);
+  const [isSaveQueryPopupOpen, setIsSaveQueryPopupOpen] = useState(false);
   const [savedQueries, setSavedQueries] = useState(() => {
     const storedQueries = localStorage.getItem("savedQueries");
     return storedQueries ? JSON.parse(storedQueries) : {};
@@ -29,7 +30,7 @@ function App() {
     localStorage.setItem("savedQueries", JSON.stringify(savedQueries));
   }, [savedQueries]);
 
-  
+
   // Manage query history in App.jsx
   const [queryHistory, setQueryHistory] = useState(() => {
     const savedHistory = localStorage.getItem("queryHistory");
@@ -92,62 +93,52 @@ function App() {
     setIsLearnOverlayOpen(false);
     setIsSavedQueryOverlayOpen(false);
   };
+  const HandleTheme = () => {
+    if (root.style.getPropertyValue('--background-color') === 'white') {
+      root.style.setProperty('--background-color', 'black');
+      root.style.setProperty('--text-color', 'rgb(143, 143, 143)');
+      root.style.setProperty('--blue-color', '#1e3a8a');
+      root.style.setProperty('--dark-gray', '#1f2937');
+      root.style.setProperty('--red-color', '#b91c1c');
+      root.style.setProperty('--orange-color', '#ea580c');
+      root.style.setProperty('--dark-orange', '#c2410c');
+      root.style.setProperty('--input-bg', 'rgba(122, 122, 122, 0.21)');
+    } else {
+      root.style.setProperty('--background-color', 'white');
+      root.style.setProperty('--text-color', 'black');
+      root.style.setProperty('--blue-color', '#b7d2fd');
+      root.style.setProperty('--dark-gray', '#f3f4f6');
+      root.style.setProperty('--red-color', '#ef4444');
+      root.style.setProperty('--orange-color', '#fbbf24');
+      root.style.setProperty('--dark-orange', '#f59e0b');
+      root.style.setProperty('--input-bg', 'white');
+    }
+  }
 
   return (
-    <div className="h-screen w-screen flex relative">
+    <div className="app-container">
       {/* Main Content */}
-      <div
-        className={`transition-all duration-300 p-5 relative ${
-          isHistoryOverlayOpen || isLearnOverlayOpen || isSavedQueryOverlayOpen
-            ? "w-[60%]"
-            : "w-full"
-        }`}
-      >
-        {/* History, Learn SQL, and Saved Query Buttons */}
-        <div className="absolute top-4 right-4 flex space-x-2">
-          <button
-            className="bg-blue-500 text-black px-4 py-2 rounded mb-4"
-            onClick={() => {
-              closeAllOverlays();
-              setIsHistoryOverlayOpen(true);
-            }}
-          >
-            History
-          </button>
-          <button
-            className="bg-green-500 text-black px-4 py-2 rounded mb-4"
-            onClick={() => {
-              closeAllOverlays();
-              setIsLearnOverlayOpen(true);
-            }}
-          >
-            Learn SQL
-          </button>
-          <button
-            className="bg-purple-500 text-black px-4 py-2 rounded mb-4"
-            onClick={() => {
-              closeAllOverlays();
-              setIsSavedQueryOverlayOpen(true);
-            }}
-          >
-            Saved Queries
-          </button>
+      <div className={`main-content ${isHistoryOverlayOpen || isLearnOverlayOpen || isSavedQueryOverlayOpen ? "main-content-reduced" : ""}`}>
+        <div className="content-container">
+          <h1 className="title">SQL Query Simulator</h1>
+          <div className="button-container">
+            <button className="theme-button" onClick={HandleTheme}><FaSun/></button>
+            <button className="history-button" onClick={() => { closeAllOverlays(); setIsHistoryOverlayOpen(true); }}><FaHistory/></button>
+            <button className="learn-button" onClick={() => { closeAllOverlays(); setIsLearnOverlayOpen(true); }}>Learn SQL</button>
+            <button className="saved-queries-button" onClick={() => { closeAllOverlays(); setIsSavedQueryOverlayOpen(true); }}>Saved Queries</button>
+          </div>
         </div>
-
-        <div className="p-5">
-          <h1 className="text-2xl font-bold mb-4">SQL Query Simulator</h1>
-          <SqlQueryGenerator />
-          <QueryInput
-            onExecute={handleUseQuery}
-            queryHistory={queryHistory}
-            setQueryHistory={setQueryHistory}
-            selectedQuery={temp}
-            onSaveQuery={handleSaveQuery}
-          />
-          {selectedQuery && <QueryResults query={selectedQuery} />}
-        </div>
+        <SqlQueryGenerator />
+        <QueryInput
+          onExecute={handleUseQuery}
+          queryHistory={queryHistory}
+          setQueryHistory={setQueryHistory}
+          selectedQuery={temp}
+          onSaveQuery={handleSaveQuery}
+        />
+        {selectedQuery && <QueryResults query={selectedQuery} />}
       </div>
-
+  
       {/* History Overlay */}
       {isHistoryOverlayOpen && (
         <Overlay
@@ -158,7 +149,7 @@ function App() {
           onClearHistory={handleClearHistory}
         />
       )}
-
+  
       {/* Learn SQL Overlay */}
       {isLearnOverlayOpen && (
         <LearnOverlay
@@ -166,7 +157,7 @@ function App() {
           onClose={() => setIsLearnOverlayOpen(false)}
         />
       )}
-
+  
       {/* Saved Query Overlay */}
       {isSavedQueryOverlayOpen && (
         <SavedQueryOverlay
@@ -177,7 +168,7 @@ function App() {
           onDeleteQuery={handleDeleteQuery}
         />
       )}
-
+  
       {/* Save Query Popup */}
       {isSaveQueryPopupOpen && (
         <SaveQueryPopup
