@@ -9,8 +9,6 @@ const SqlQueryGenerator = () => {
 
     const handleGenerateQuery = async () => {
         try {
-            console.log(prompt);
-            
             const key = import.meta.env.VITE_HF_API_KEY
             const inference = new HfInference(key);
             const model = "cssupport/t5-small-awesome-text-to-sql";
@@ -19,8 +17,6 @@ const SqlQueryGenerator = () => {
                 model: model,
                 inputs: prompt,
             });
-            console.log(response.generated_text);
-            
             setSqlQuery(response.generated_text);
             
         } catch (error) {
