@@ -8,8 +8,6 @@ SQL Query Simulator is an intuitive web-based tool designed to help users simula
 
 - **Frontend Framework**: React.js (v19.0.0) for building a dynamic and responsive user interface.
 - **Build Tool**: Vite for lightning-fast development and optimized production builds.
-- **Styling**: Tailwind CSS for sleek, responsive, and modern design.
-- **Backend**: Node.js with a suite of utility packages for server-side processing.
 
 ## Key Dependencies
 
