@@ -15,6 +15,7 @@
     width: 100vw;
     display: flex;
     position: relative;
+    overflow-x: hidden;
 }
 
 .main-content {
@@ -626,6 +627,7 @@
     background-color: var(--dark-gray);
     padding: 8px;
     border-radius: 4px;
+    color:var(--text-color);
 }
 
 

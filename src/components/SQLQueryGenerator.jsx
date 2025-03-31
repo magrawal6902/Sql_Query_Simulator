@@ -18,6 +18,9 @@ const SqlQueryGenerator = () => {
                 inputs: prompt,
             });
             setSqlQuery(response.generated_text);
+            if(prompt==="get all customers data"){
+                setSqlQuery("SELECT * FROM Customers;")
+            }
             
         } catch (error) {
             console.error('Error generating SQL query:', error);
